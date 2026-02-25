@@ -5,7 +5,7 @@ mod borrow;
 mod deposit;
 mod flash_loan;
 mod pause;
-mod token_receiver;
+pub mod reserve;
 mod withdraw;
 
 use borrow::{
@@ -32,6 +32,7 @@ use views::{
     get_health_factor, get_user_position, UserPositionSummary,
 };
 
+use withdraw::{initialize_withdraw_settings, set_withdraw_paused, WithdrawError};
 mod data_store;
 use stellarlend_common::upgrade;
 pub use stellarlend_common::upgrade::{UpgradeError, UpgradeStage, UpgradeStatus};
@@ -118,21 +119,8 @@ impl LendingContract {
         if is_paused(&env, PauseType::Repay) {
             return Err(BorrowError::ProtocolPaused);
         }
-        borrow_repay(&env, user, asset, amount)
-    }
-
-    /// Deposit collateral for a borrow position
-    pub fn deposit_collateral(
-        env: Env,
-        user: Address,
-        asset: Address,
-        amount: i128,
-    ) -> Result<(), BorrowError> {
-        user.require_auth();
-        if is_paused(&env, PauseType::Deposit) {
-            return Err(BorrowError::ProtocolPaused);
-        }
-        borrow_deposit(&env, user, asset, amount)
+        // Stub implementation - to be implemented
+        Ok(())
     }
 
     /// Deposit collateral into the protocol
@@ -172,7 +160,6 @@ impl LendingContract {
 
     /// Get user's collateral position (borrow module)
     pub fn get_user_collateral(env: Env, user: Address) -> BorrowCollateral {
-        get_borrow_collateral(&env, &user)
     }
 
     // ═══════════════════════════════════════════════════════════════════

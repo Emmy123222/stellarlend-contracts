@@ -36,28 +36,6 @@ fn require_admin(env: &Env, caller: &Address) -> Result<(), RiskManagementError>
     }
     Ok(())
 }
-//! # StellarLend Core Contract
-//!
-//! The main entrypoint for the StellarLend lending protocol on Soroban.
-//!
-//! This contract orchestrates all protocol operations including:
-//! - **Collateral management**: deposit and withdraw collateral assets
-//! - **Borrowing**: borrow assets against deposited collateral
-//! - **Repayment**: repay debt (partial or full) with interest
-//! - **Liquidation**: liquidate undercollateralized positions
-//! - **Risk management**: configurable risk parameters and pause controls
-//! - **Interest rates**: dynamic kink-based interest rate model
-//! - **Oracle integration**: price feeds with staleness checks and fallbacks
-//! - **Flash loans**: uncollateralized single-transaction loans
-//! - **Analytics**: protocol and user reporting
-//! - **Governance**: on-chain proposal voting and execution
-
-#![allow(clippy::too_many_arguments)]
-#![allow(deprecated)]
-#![allow(unused_variables)]
-#![no_std]
-
-use soroban_sdk::{contract, contractimpl, Address, Env, Map, String, Symbol, Vec};
 
 mod admin;
 mod borrow;
@@ -65,6 +43,7 @@ mod deposit;
 mod errors;
 mod events;
 mod repay;
+mod reserve;
 mod risk_management;
 mod risk_params;
 mod withdraw;
@@ -126,6 +105,8 @@ use bridge::{
 mod liquidate;
 use liquidate::liquidate;
 
+pub mod reentrancy;
+
 mod interest_rate;
 #[allow(unused_imports)]
 use interest_rate::{
@@ -150,33 +131,12 @@ use crate::types::{
 /// Provides the public API for all lending protocol operations. Each method
 /// delegates to the corresponding module implementation and converts internal
 /// errors into panics for Soroban's contract-call semantics.
+
 #[contract]
 pub struct HelloContract;
 
 #[contractimpl]
 impl HelloContract {
-    /// Initialize the contract with an admin address
-    pub fn initialize(env: Env, admin: Address) {
-        let admin_key = DepositDataKey::Admin;
-        if env.storage().persistent().has(&admin_key) {
-            panic!("Already initialized");
-        }
-        env.storage().persistent().set(&admin_key, &admin);
-
-        // Initialize protocol analytics
-        let analytics_key = DepositDataKey::ProtocolAnalytics;
-        let analytics = ProtocolAnalytics {
-            total_deposits: 0,
-            total_borrows: 0,
-            total_value_locked: 0,
-        };
-        env.storage().persistent().set(&analytics_key, &analytics);
-
-        // Initialize other modules
-        interest_rate::initialize_interest_rate_config(&env, admin.clone()).unwrap();
-        risk_management::initialize_risk_management(&env, admin).unwrap();
-    }
-
     /// Deposit assets into the protocol
     /// Health-check endpoint.
     ///
@@ -277,8 +237,6 @@ impl HelloContract {
         deposit::deposit_collateral(&env, user, asset, amount)
     }
 
-    /// Withdraw assets from the protocol
-    pub fn withdraw_asset(
     /// Set native asset address (admin only). Required before using asset = None for deposit/borrow/repay.
     pub fn set_native_asset_address(
         env: Env,
@@ -748,7 +706,6 @@ pub fn ms_execute(
     pub fn get_protocol_analytics(env: Env) -> Result<crate::analytics::ProtocolMetrics, crate::analytics::AnalyticsError> {
         analytics::get_protocol_stats(&env)
     }
-}
 
     /// Initialize AMM settings (admin only)
     pub fn initialize_amm(
@@ -855,6 +812,8 @@ pub fn ms_execute(
     /// Get configuration of a specific bridge
     pub fn get_bridge_config(env: Env, network_id: u32) -> Result<BridgeConfig, BridgeError> {
         bridge::get_bridge_config(&env, network_id)
+    }
+
     /// Set a configuration value (admin only)
     ///
     /// # Arguments
@@ -1530,7 +1489,13 @@ pub fn ms_execute(
 }
 
 #[cfg(test)]
-mod tests;
+mod test;
+
+#[cfg(test)]
+mod test_reentrancy;
+
+#[cfg(test)]
+mod test_zero_amount;
 
 #[cfg(test)]
 mod flash_loan_test;
