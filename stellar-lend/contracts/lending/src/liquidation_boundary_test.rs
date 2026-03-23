@@ -44,7 +44,15 @@ impl MockOracle {
 // Helpers
 // ─────────────────────────────────────────────────────────────────────────────
 
-fn setup(env: &Env) -> (LendingContractClient<'_>, Address, Address, Address, Address) {
+fn setup(
+    env: &Env,
+) -> (
+    LendingContractClient<'_>,
+    Address,
+    Address,
+    Address,
+    Address,
+) {
     let contract_id = env.register(LendingContract, ());
     let client = LendingContractClient::new(env, &contract_id);
     let admin = Address::generate(env);
@@ -171,7 +179,8 @@ fn test_max_liquidatable_includes_accrued_interest() {
     let (client, admin, user, asset, collateral_asset) = setup_with_oracle(&env);
     client.set_liquidation_threshold_bps(&admin, &4000);
     client.borrow(&user, &asset, &10_000, &collateral_asset, &15_000);
-    env.ledger().with_mut(|li| li.timestamp = 1_000 + 31_536_000);
+    env.ledger()
+        .with_mut(|li| li.timestamp = 1_000 + 31_536_000);
     let total_debt = client.get_debt_balance(&user);
     assert!(total_debt > 10_000, "interest should have accrued");
     let max_liq = client.get_max_liquidatable_amount(&user);
@@ -193,7 +202,10 @@ fn test_max_liquidatable_just_below_boundary_is_liquidatable() {
     let hf = client.get_health_factor(&user);
     assert!(hf < HEALTH_FACTOR_SCALE, "position must be liquidatable");
     let max_liq = client.get_max_liquidatable_amount(&user);
-    assert!(max_liq > 0, "max_liq must be > 0 for under-collateralised position");
+    assert!(
+        max_liq > 0,
+        "max_liq must be > 0 for under-collateralised position"
+    );
 }
 
 // ─────────────────────────────────────────────────────────────────────────────

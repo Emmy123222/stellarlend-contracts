@@ -268,7 +268,7 @@ pub fn set_liquidation_incentive_bps(
         return Err(BorrowError::Unauthorized);
     }
     admin.require_auth();
-    if bps < 0 || bps > 10000 {
+    if !(0..=10000).contains(&bps) {
         return Err(BorrowError::InvalidAmount);
     }
     env.storage()
