@@ -11,7 +11,10 @@
 //   token_receiver.rs: 28
 
 use super::*;
-use soroban_sdk::{testutils::{Address as _, Ledger}, Address, Bytes, Env, IntoVal, Symbol};
+use soroban_sdk::{
+    testutils::{Address as _, Ledger},
+    Address, Bytes, Env, IntoVal, Symbol,
+};
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Helper
@@ -336,7 +339,10 @@ fn test_repay_only_interest_partial() {
     });
 
     let debt_before = client.get_user_debt(&user);
-    assert!(debt_before.interest_accrued > 0, "interest must have accrued");
+    assert!(
+        debt_before.interest_accrued > 0,
+        "interest must have accrued"
+    );
 
     // Repay exactly 1 unit — less than interest_accrued, so only interest shrinks.
     let result = client.try_repay(&user, &asset, &1);
