@@ -1,3 +1,5 @@
+#![cfg(not(tarpaulin_include))]
+#![allow(unexpected_cfgs)]
 use soroban_sdk::{Env, Symbol};
 
 pub struct ReentrancyGuard<'a> {
