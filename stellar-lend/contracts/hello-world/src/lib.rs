@@ -1,8 +1,7 @@
-use soroban_sdk::{contract, contractimpl, Address, Env, Map, Symbol, Vec, contracttype, contracterror};
 #![allow(deprecated)]
 #![allow(unused_imports)]
 #![allow(dead_code)]
-use soroban_sdk::{contract, contractimpl, Address, Env, Map, Symbol, Vec};
+use soroban_sdk::{contract, contracterror, contractevent, contractimpl, contracttype, Address, Env, Map, Symbol, Vec, I256};
 
 pub mod admin;
 pub mod amm;
@@ -31,8 +30,8 @@ pub mod types;
 pub mod withdraw;
 
 // Legacy test suite currently mismatches contract API and is excluded from CI compile.
-// #[cfg(test)]
-// mod tests;
+#[cfg(test)]
+mod tests;
 
 use crate::oracle::OracleConfig;
 use crate::risk_management::{RiskConfig, RiskManagementError};
@@ -371,18 +370,25 @@ impl HelloContract {
         crate::repay::repay_debt(&env, user, asset, amount)
     }
 
-    /// Liquidate an undercollateralized position
-    pub fn liquidate(env: Env, caller: Address, paused: bool) -> Result<(), RiskManagementError> {
+    /// Set emergency pause (admin only).
+    pub fn set_emergency_pause(
+        env: Env,
+        caller: Address,
+        paused: bool,
+    ) -> Result<(), RiskManagementError> {
         risk_management::set_emergency_pause(&env, caller, paused)
+    }
+
     /// Liquidate an undercollateralized position.
     pub fn liquidate(
         env: Env,
-        caller: Address,
+        liquidator: Address,
         borrower: Address,
-        asset: Option<Address>,
-        amount: i128,
-    ) -> Result<i128, crate::liquidate::LiquidateError> {
-        liquidate(&env, caller, borrower, asset, amount)
+        debt_asset: Option<Address>,
+        collateral_asset: Option<Address>,
+        debt_amount: i128,
+    ) -> Result<(i128, i128, i128), crate::liquidate::LiquidationError> {
+        liquidate(&env, liquidator, borrower, debt_asset, collateral_asset, debt_amount)
     }
 
     /// Get current risk configuration.

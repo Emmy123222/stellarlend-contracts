@@ -11,7 +11,8 @@ pub mod integration_test;
 pub mod interest_accrual_test;
 pub mod interest_rate_test;
 // Legacy API mismatch with current contract surface.
-// pub mod liquidate_test;
+pub mod liquidate_test;
+pub mod liquidate_hardened_test;
 pub mod oracle_test;
 // Legacy API mismatch with current contract surface.
 // pub mod pause_test;
