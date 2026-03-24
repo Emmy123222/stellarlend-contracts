@@ -13,7 +13,7 @@
 use super::*;
 use soroban_sdk::{
     testutils::{Address as _, Ledger},
-    Address, Bytes, Env, IntoVal, Symbol,
+    Address, Bytes, Env,
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -165,7 +165,7 @@ fn test_data_store_init_second_call_is_noop() {
 fn test_data_grant_and_revoke_writer() {
     let env = Env::default();
     env.mock_all_auths();
-    let (client, admin, user, asset) = setup(&env);
+    let (client, admin, _user, _asset) = setup(&env);
 
     client.data_store_init(&admin);
 
@@ -440,7 +440,7 @@ fn test_initialize_deposit_settings_no_admin_unauthorized() {
 fn test_set_deposit_paused_and_unpaused() {
     let env = Env::default();
     env.mock_all_auths();
-    let (client, admin, user, asset) = setup(&env);
+    let (client, _admin, user, asset) = setup(&env);
 
     client.initialize_deposit_settings(&1_000_000_000, &100);
 
