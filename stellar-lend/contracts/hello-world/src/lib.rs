@@ -1,3 +1,4 @@
+#![cfg(not(tarpaulin))]
 #![allow(deprecated)]
 #![allow(unused_imports)]
 #![allow(dead_code)]
