@@ -703,6 +703,20 @@ fn test_accrued_interest_partial_year() {
     assert_eq!(interest, 50_000);
 }
 
+/// Test fractional accrued interest rounds up toward protocol safety
+#[test]
+fn test_accrued_interest_rounds_up_fractional_result() {
+    let principal = 100_000i128;
+    let rate_bps = 500i128;
+    let last_accrual = 0u64;
+    let current_time = 1u64;
+
+    let interest =
+        calculate_accrued_interest(principal, last_accrual, current_time, rate_bps).unwrap();
+
+    assert_eq!(interest, 1);
+}
+
 /// Test accrued interest with zero principal
 #[test]
 fn test_accrued_interest_zero_principal() {
