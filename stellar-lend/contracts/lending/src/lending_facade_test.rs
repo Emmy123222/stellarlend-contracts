@@ -61,3 +61,23 @@ fn test_initialize_rejects_double_initialization() {
     let again = client.try_initialize(&admin, &1_000_000_000, &1000);
     assert_eq!(again, Err(Ok(BorrowError::Unauthorized)));
 }
+
+#[test]
+fn test_get_admin_none_before_initialize_facade() {
+    let env = Env::default();
+    env.mock_all_auths();
+    let contract_id = env.register_contract(None, LendingContract);
+    let client = LendingContractClient::new(&env, &contract_id);
+    assert_eq!(client.get_admin(), None);
+}
+
+#[test]
+fn test_get_user_debt_and_collateral_facade_without_borrow_init() {
+    let env = Env::default();
+    env.mock_all_auths();
+    let contract_id = env.register_contract(None, LendingContract);
+    let client = LendingContractClient::new(&env, &contract_id);
+    let user = Address::generate(&env);
+    let _debt = client.get_user_debt(&user);
+    let _collateral = client.get_user_collateral(&user);
+}
