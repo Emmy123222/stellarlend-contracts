@@ -6,6 +6,7 @@ members = [
   "contracts/bridge",
   "contracts/common",
   "contracts/lending",
+  "indexing_system",
 ]
 
 [workspace.dependencies]
