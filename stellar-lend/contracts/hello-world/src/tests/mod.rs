@@ -34,8 +34,10 @@ pub mod test_helpers;
 // Cross-asset tests disabled - contract methods not yet implemented
 // pub mod views_test;
 // pub mod test_cross_asset;
+pub mod test_cross_asset_borrow_repay_edge_cases;
 // API mismatch (AmmError, AmmProtocolConfig, SwapParams, TokenPair not exported from root).
 // pub mod amm_impact_test;
+pub mod collateral_factor_max_borrow_spec;
 pub mod borrow_boundaries_test;
 pub mod borrow_cap_test;
 pub mod borrow_test;
