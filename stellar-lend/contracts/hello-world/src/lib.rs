@@ -305,7 +305,7 @@ impl HelloContract {
     /// Liquidate an undercollateralized position.
     pub fn liquidate(
         env: Env,
-        caller: Address,
+        liquidator: Address,
         borrower: Address,
         asset: Option<Address>,
         amount: i128,

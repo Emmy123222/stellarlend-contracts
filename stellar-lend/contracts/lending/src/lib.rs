@@ -86,6 +86,8 @@ mod upgrade_test;
 mod withdraw_test;
 
 #[cfg(test)]
+mod borrow_test_booster;
+#[cfg(test)]
 mod liquidation_boundary_test;
 #[cfg(test)]
 mod stress_test;
