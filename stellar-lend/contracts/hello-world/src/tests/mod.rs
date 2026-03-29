@@ -1,6 +1,3 @@
-// Active test modules — only include modules that compile cleanly
-// against the current contract API surface.
-
 pub mod config_snapshot_test;
 pub mod config_test;
 pub mod governance_test;

@@ -1,6 +1,8 @@
 #![allow(deprecated)]
 #![allow(unused_imports)]
 #![allow(dead_code)]
+
+use soroban_sdk::{contract, contractimpl, Address, Env, Map, Symbol, Vec};
 use soroban_sdk::{contract, contractimpl, Address, Env, Map, Symbol, Vec, contracttype, contracterror};
 
 pub mod admin;
@@ -30,6 +32,8 @@ pub mod storage;
 pub mod types;
 pub mod withdraw;
 
+#[cfg(test)]
+mod tests;
 // Legacy test suite currently mismatches contract API and is excluded from CI compile.
 // #[cfg(test)]
 // mod tests;
@@ -1318,8 +1322,6 @@ mod tests;
 // mod test;
 #[cfg(test)]
 mod test_reentrancy;
-
-#[cfg(test)]
 mod flash_loan_test;
 
 #[cfg(test)]
