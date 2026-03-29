@@ -4,6 +4,7 @@
 use soroban_sdk::{contract, contractimpl, Address, Bytes, BytesN, Env, Val, Vec};
 
 mod borrow;
+mod cross_asset;
 mod deposit;
 mod flash_loan;
 mod oracle;
@@ -11,6 +12,12 @@ mod pause;
 mod token_receiver;
 mod withdraw;
 
+use cross_asset::{
+    borrow_asset as cross_borrow_asset, deposit_collateral_asset as cross_deposit_collateral,
+    get_cross_position_summary as cross_position_summary, initialize_admin as cross_init_admin,
+    repay_asset as cross_repay_asset, set_asset_params as cross_set_asset_params,
+    withdraw_asset as cross_withdraw_asset, AssetParams, CrossAssetError, PositionSummary,
+};
 use borrow::{
     borrow as borrow_impl, deposit as borrow_deposit, get_admin as get_protocol_admin,
     get_close_factor_bps as get_close_factor_impl,
@@ -61,6 +68,8 @@ pub use stellarlend_common::upgrade::{UpgradeError, UpgradeStage, UpgradeStatus}
 
 #[cfg(test)]
 mod borrow_test;
+#[cfg(test)]
+mod cross_asset_test;
 #[cfg(test)]
 mod deposit_test;
 #[cfg(test)]
@@ -660,6 +669,69 @@ impl LendingContract {
 
     pub fn data_key_exists(env: Env, key: soroban_sdk::String) -> bool {
         data_store::DataStore::key_exists(env, key)
+    }
+
+    // ═══════════════════════════════════════════════════════════════════
+    // Cross-Asset Operations
+    // ═══════════════════════════════════════════════════════════════════
+
+    /// Initialize admin for cross-asset operations
+    pub fn initialize_admin(env: Env, admin: Address) {
+        cross_init_admin(&env, admin);
+    }
+
+    /// Set parameters for a specific asset (admin only)
+    pub fn set_asset_params(
+        env: Env,
+        asset: Address,
+        params: AssetParams,
+    ) -> Result<(), CrossAssetError> {
+        cross_set_asset_params(&env, asset, params)
+    }
+
+    /// Deposit collateral for a specific asset
+    pub fn deposit_collateral_asset(
+        env: Env,
+        user: Address,
+        asset: Address,
+        amount: i128,
+    ) -> Result<(), CrossAssetError> {
+        cross_deposit_collateral(&env, user, asset, amount)
+    }
+
+    /// Borrow a specific asset against cross-asset collateral
+    pub fn borrow_asset(
+        env: Env,
+        user: Address,
+        asset: Address,
+        amount: i128,
+    ) -> Result<(), CrossAssetError> {
+        cross_borrow_asset(&env, user, asset, amount)
+    }
+
+    /// Repay debt for a specific asset
+    pub fn repay_asset(
+        env: Env,
+        user: Address,
+        asset: Address,
+        amount: i128,
+    ) -> Result<(), CrossAssetError> {
+        cross_repay_asset(&env, user, asset, amount)
+    }
+
+    /// Withdraw collateral for a specific asset
+    pub fn withdraw_asset(
+        env: Env,
+        user: Address,
+        asset: Address,
+        amount: i128,
+    ) -> Result<(), CrossAssetError> {
+        cross_withdraw_asset(&env, user, asset, amount)
+    }
+
+    /// Get cross-asset position summary for a user
+    pub fn get_cross_position_summary(env: Env, user: Address) -> Result<PositionSummary, CrossAssetError> {
+        cross_position_summary(&env, user)
     }
 }
 
