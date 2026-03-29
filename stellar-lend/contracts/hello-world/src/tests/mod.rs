@@ -47,4 +47,21 @@ pub mod interest_rate_test;    // re-enabled: API aligned with new entrypoints
 pub mod test_helpers;
 pub mod cross_asset_test;
 // pub mod views_test;
+// Cross-asset tests re-enabled when contract exposes full CA API (try_* return Result; get_user_asset_position; try_ca_repay_debt)
+// pub mod test_cross_asset;
+// Legacy API mismatch with current contract surface.
+// pub mod bridge_test;
+// pub mod cross_contract_test;
+// pub mod multisig_governance_execution_test;
+pub mod amm_impact_test;
+pub mod borrow_cap_test;
+pub mod bridge_test;
+pub mod cross_contract_test;
+pub mod config_snapshot_test;
+pub mod oracle_staleness_fallback_test;
+pub mod gov_asset_test;
+pub mod multisig_governance_execution_test;
+pub mod multisig_test;
+pub mod recovery_test;
+pub mod fuzz_test;
 // pub mod fees_test;
